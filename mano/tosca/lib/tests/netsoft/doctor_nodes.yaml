@@ -1,0 +1,256 @@
+
+
+#########VNF########
+
+node_types:
+  tosca.nodes.nfv.doctor.VNF:
+    derived_from: tosca.nodes.Root
+    description: >-
+      Software implementation of a network function
+
+    properties:
+      id:
+        type: string
+        description: ID of this VNF
+      vendor:
+        type: string
+        description: name of the vendor who generate this VNF
+      version:
+        type: version
+        description: version of the software for this VNF
+      ndn_name:
+        type: string
+        description: ndn prefix to be annouced
+        required: False
+      mode:
+        type: string
+        description: signature verification mode
+        required: False
+        constraints:
+        - valid_values: [ SV, NO_SV ]
+
+    requirements:
+      - VDU:
+          capability: tosca.capabilities.nfv.VirtualCompute
+          node: tosca.nodes.nfv.doctor.VDU
+
+#########VNF########
+
+  tosca.nodes.nfv.doctor.VNF.ingressGW:
+    derived_from: tosca.nodes.nfv.doctor.VNF
+    description: >-
+      Software implementation of an ingress gateway
+
+#########Firewall########
+
+
+  tosca.nodes.nfv.doctor.VNF.firewall:
+    derived_from: tosca.nodes.nfv.doctor.VNF
+    description: >-
+      Software implementation of a ndn firewall
+
+    properties:
+      configuration:
+        type: tosca.nfv.datatypes.firewallConfig
+        description: firewall initial configuration
+        required: False
+
+#########VDU########
+#TODO: requirements ?
+
+  tosca.nodes.nfv.doctor.VDU:
+    derived_from: tosca.nodes.Compute
+    description: >-
+      Virtual Deployment Units (VDU) describes a VNF in terms of its deployment
+      and operational behavior requirements
+
+    properties:
+      name:
+        description: Human readable name of the VDU
+        type: string
+        required: true
+      sw_image:
+        description: Software image which is directly loaded on the virtualization container
+        type: string
+        required: true
+      flavor:
+        description: Virtual hardware templates defining sizes for RAM, disk, number of cores.
+        type: string
+        required: false
+      placement_policy:
+        description: Policy to be followed for placing VDU on nfvi ressources (hosts)
+        type: list
+        required: false
+      config:
+        description: scipt which is used to launch and config vnf
+        type: string
+        required: false
+      service_port:
+        type: integer
+        description: target and public port to be exposed to external networks
+        required: false
+
+    capabilities:
+      virtual_bindable:
+        type: tosca.capabilities.nfv.VirtualBindable
+
+
+#    requirements:
+#      - virtualLink:
+#          capability: tosca.capabilities.nfv.VirtualLinkable
+#          node: tosca.nodes.nfv.VL
+
+
+#########ConnectionPoint#########
+
+  tosca.nodes.nfv.doctor.Cpd:
+      derived_from: tosca.nodes.network.Port
+      description: >-
+        Network connectivity point to a compute resource or a VL
+
+      properties:
+        name:
+          type: string
+          required: false
+        layer_protocol:
+          type: string
+          constraints:
+            - valid_values: [ VXLAN ]
+          required: false
+        address:
+          #just meta infos, not the actual IP address
+          type: tosca.datatypes.nfv.L3AddressData # Not built-in tosca parser, need to be defined
+          required: false
+
+      requirements:
+        - virtual_link:
+            description: association with a VL
+            capability: tosca.capabilities.nfv.VirtualLinkable
+            node: tosca.nodes.nfv.doctor.VnfVirtualLinkDesc
+        - virtual_binding:
+            description: association with a VDU
+            capability: tosca.capabilities.nfv.VirtualBindable
+            node: tosca.nodes.nfv.doctor.VDU
+
+
+#########VnfVirtualLinkDesc#########
+
+  tosca.nodes.nfv.doctor.VnfVirtualLinkDesc:
+      derived_from: tosca.nodes.network.Network
+      description: >-
+         Logical internal virtual link
+
+      properties:
+        name:
+          type: string
+          required: false
+        connectivity_type:
+          type: string
+          constraints:
+            - valid_values: [ VXLAN ]
+#        subnet:
+#          type: tosca.datatypes.nfv.L3AddressData
+#          required: true
+
+
+      capabilities:
+        virtual_linkable:
+          type: tosca.capabilities.nfv.VirtualLinkable
+
+#########Forwarding path#########
+
+  tosca.nodes.nfv.doctor.FP:
+    derived_from: tosca.nodes.Root
+    properties:
+      id:
+        type: integer
+        required: false
+      policy:
+        type: tosca.nfv.datatypes.policyType
+        required: true
+        description: policy to use to match traffic for this FP
+      path:
+        type: list
+        required: true
+        entry_schema:
+          type: tosca.nfv.datatypes.pathType
+
+#########Forwarding Graph#########
+
+  tosca.groups.nfv.doctor.VNFFG:
+    derived_from: tosca.groups.Root
+
+    properties:
+      vendor:
+        type: string
+        required: ture
+        description: name of the vendor who generate this VNFFG
+
+      version:
+        type: string
+        required: true
+        description: version of this VNFFG
+
+      number_of_endpoints:
+      # not supported yet
+        type: integer
+        required: false
+        description: count of the external endpoints included in this VNFFG
+
+      dependent_virtual_link:
+        type: list
+        entry_schema:
+          type: string
+        required: true
+        description: Reference to a VLD  used in this Forwarding Graph
+
+      connection_point:
+        type: list
+        entry_schema:
+          type: string
+        required: true
+        description: Reference to Connection Points forming the VNFFG
+
+      constituent_vnfs:
+        type: list
+        entry_schema:
+          type: string
+        required: true
+        description: Reference to a list of  VNFD used in this VNF Forwarding Graph
+
+######### Monitoring Policies #########
+
+policy_types:
+
+  tosca.policies.nfv.doctor.security.signature_verification:
+    derived_from: tosca.policies.Root
+
+    properties:
+      id:
+        type: integer
+        required: false
+        description: id of the policy
+
+  tosca.policies.nfv.doctor.ndn.security.update_firewall:
+    derived_from: tosca.policies.Root
+
+    properties:
+      id:
+        type: integer
+        required: false
+        description: id of the policy
+
+
+  tosca.policies.nfv.doctor.ndn.scaling:
+    derived_from: tosca.policies.Root
+
+    properties:
+      id:
+        type: integer
+        required: false
+        description: id of the policy
+      meter_name:
+        type: string
+        required: true
+        description: meter to monitor
+

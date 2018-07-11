@@ -1,0 +1,25 @@
+#!/bin/bash
+
+docker service rm vnfm
+docker service rm VDU1
+docker service rm VDU2
+docker service rm VDU3
+docker service rm VDU4
+docker service rm VDU5
+docker service rm VDU6
+docker service rm VDU7
+docker service rm VDU8
+docker service rm VDU9
+docker service rm VDUX
+
+docker network rm admin_net
+docker network rm VL1
+docker network rm VL2
+docker network rm VL3
+docker network rm VL4
+docker network rm VL5
+docker network rm VL6
+docker network rm VL7
+docker network rm VL8
+docker network rm VL9
+docker network rm VL10

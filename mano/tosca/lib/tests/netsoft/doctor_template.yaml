@@ -1,0 +1,258 @@
+imports:
+  - data.yaml
+  - doctor_nodes.yaml
+
+tosca_definitions_version: tosca_simple_profile_for_nfv_1_0_0
+
+description: Template for deploying a single server with predefined properties.
+
+metadata:
+  template_name: TOSCA NFV Sample Template
+
+topology_template:
+  node_templates:
+
+    fr_ingress_gw:
+      type: tosca.nodes.nfv.doctor.VNF
+      properties:
+        id: 1
+        vendor: orange
+        version: 1.0
+      requirements:
+        - VDU: VDU1
+
+    nfd_router_1:
+      type: tosca.nodes.nfv.doctor.VNF
+      properties:
+        id: 2
+        vendor: orange
+        version: 1.0
+      requirements:
+        - VDU: VDU2
+
+    fr_egress_gw:
+      type: tosca.nodes.nfv.doctor.VNF
+      properties:
+        id: 3
+        vendor: orange
+        version: 1.0
+      requirements:
+        - VDU: VDU3
+
+    nfd_router_2:
+      type: tosca.nodes.nfv.doctor.VNF
+      properties:
+        id: 4
+        vendor: orange
+        version: 1.0
+      requirements:
+        - VDU: VDU4
+
+    de_egress_gw:
+      type: tosca.nodes.nfv.doctor.VNF
+      properties:
+        id: 5
+        vendor: orange
+        version: 1.0
+      requirements:
+        - VDU: VDU5
+
+    VDU1:
+      type: tosca.nodes.nfv.doctor.VDU
+      properties:
+        name: VDU1
+        sw_image: maouadj/ingress_gateway
+        config: sleep infinity
+        service_port: 8080
+        flavor: medium
+        placement_policy: ['localisation == France']
+
+    VDU2:
+      type: tosca.nodes.nfv.doctor.VDU
+      properties:
+        name: VDU2
+        sw_image: maouadj/nfd_router
+        config: sleep infinity
+        flavor: medium
+        placement_policy: ['localisation == France']
+
+    VDU3:
+      type: tosca.nodes.nfv.doctor.VDU
+      properties:
+        name: VDU3
+        sw_image: maouadj/egress_gateway
+        config: sleep infinity
+        flavor: medium
+        placement_policy: ['localisation == France']
+
+    VDU4:
+      type: tosca.nodes.nfv.doctor.VDU
+      properties:
+        name: VDU4
+        sw_image: maouadj/nfd_router
+        config: sleep infinity
+        flavor: medium
+        placement_policy: ['localisation == France']
+
+    VDU5:
+      type: tosca.nodes.nfv.doctor.VDU
+      properties:
+        name: VDU5
+        sw_image: maouadj/egress_gateway
+        config: sleep infinity
+        flavor: medium
+        placement_policy: ['localisation == France']
+
+    CP10:
+      type: tosca.nodes.nfv.doctor.Cpd
+      properties:
+        name: CP10
+        layer_protocol: VXLAN
+      requirements:
+        - virtual_link: VL1
+        - virtual_binding: VDU1
+
+    CP11:
+      type: tosca.nodes.nfv.doctor.Cpd
+      properties:
+        name: CP11
+        layer_protocol: VXLAN
+      requirements:
+        - virtual_link: VL3
+        - virtual_binding: VDU1
+
+    CP20:
+      type: tosca.nodes.nfv.doctor.Cpd
+      properties:
+        name: CP20
+        layer_protocol: VXLAN
+      requirements:
+        - virtual_link: VL1
+        - virtual_binding: VDU2
+
+    CP21:
+      type: tosca.nodes.nfv.doctor.Cpd
+      properties:
+        name: CP21
+        layer_protocol: VXLAN
+      requirements:
+        - virtual_link: VL2
+        - virtual_binding: VDU2
+
+    CP30:
+      type: tosca.nodes.nfv.doctor.Cpd
+      properties:
+        name: CP30
+        layer_protocol: VXLAN
+      requirements:
+        - virtual_link: VL2
+        - virtual_binding: VDU3
+
+    CP40:
+      type: tosca.nodes.nfv.doctor.Cpd
+      properties:
+        name: CP40
+        layer_protocol: VXLAN
+      requirements:
+        - virtual_link: VL3
+        - virtual_binding: VDU4
+
+    CP41:
+      type: tosca.nodes.nfv.doctor.Cpd
+      properties:
+        name: CP41
+        layer_protocol: VXLAN
+      requirements:
+        - virtual_link: VL4
+        - virtual_binding: VDU4
+
+    CP50:
+      type: tosca.nodes.nfv.doctor.Cpd
+      properties:
+        name: CP50
+        layer_protocol: VXLAN
+      requirements:
+        - virtual_link: VL4
+        - virtual_binding: VDU5
+
+    VL1:
+      type: tosca.nodes.nfv.doctor.VnfVirtualLinkDesc
+      properties:
+        name: VL1
+        connectivity_type: VXLAN
+
+    VL2:
+      type: tosca.nodes.nfv.doctor.VnfVirtualLinkDesc
+      properties:
+        name: VL2
+        connectivity_type: VXLAN
+
+    VL3:
+      type: tosca.nodes.nfv.doctor.VnfVirtualLinkDesc
+      properties:
+        name: VL3
+        connectivity_type: VXLAN
+
+    VL4:
+      type: tosca.nodes.nfv.doctor.VnfVirtualLinkDesc
+      properties:
+        name: VL4
+        connectivity_type: VXLAN
+
+
+##########################################################################
+ # Forwarding paths
+##########################################################################
+
+
+    Forwarding_path1:
+      type: tosca.nodes.nfv.doctor.FP
+      description: creates path (fr_ingress_gw->nfd_router_1->fr_egress_gw)
+      properties:
+        id: 1
+        policy:
+          type: NDN
+          prefix: [com, fr]
+        path:
+          - forwarder: fr_ingress_gw
+            capability: CP10
+          - forwarder: nfd_router_1
+            capability: CP20
+          - forwarder: nfd_router_1
+            capability: CP21
+          - forwarder: fr_egress_gw
+            capability: CP30
+
+    Forwarding_path2:
+      type: tosca.nodes.nfv.doctor.FP
+      description: creates path (fr_ingress_gw->nfd_router_2->de_egress_gw)
+      properties:
+        id: 2
+        policy:
+          type: NDN
+          prefix: [de]
+        path:
+          - forwarder: fr_ingress_gw
+            capability: CP11
+          - forwarder: nfd_router_2
+            capability: CP40
+          - forwarder: nfd_router_2
+            capability: CP41
+          - forwarder: de_egress_gw
+            capability: CP50
+
+##########################################################################
+ # Forwarding graph
+##########################################################################
+
+  groups:
+    VNFFG1:
+      type: tosca.groups.nfv.doctor.VNFFG
+      description: FR and COM interest to fr_egress_gw
+      properties:
+        vendor: Doctor
+        version: 1.0
+        dependent_virtual_link: [VL1, VL2]
+        connection_point: [CP10, CP11, CP20, CP21, CP30, CP40, CP41, CP50]
+        constituent_vnfs: [fr_ingress_gw,nfd_router_1, fr_egress_gw, nfd_router_2, de_egress_gw]
+      members: [Forwarding_path1, Forwarding_path2]

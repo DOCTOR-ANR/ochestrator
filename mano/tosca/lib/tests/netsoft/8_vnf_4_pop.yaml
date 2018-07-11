@@ -1,0 +1,168 @@
+imports:
+  - data.yaml
+  - doctor_nodes.yaml
+
+tosca_definitions_version: tosca_simple_profile_for_nfv_1_0_0
+
+description: Template for deploying DOCTOR's security use case.
+
+metadata:
+  template_name: security_policies_example
+
+topology_template:
+  node_templates:
+
+##########################################################################
+ # Virtual Network Functions
+##########################################################################
+
+    router_1:
+      type: tosca.nodes.nfv.doctor.VNF
+      properties:
+        id: 1
+        vendor: orange
+        version: 1.0
+      requirements:
+        - VDU: VDU1
+
+
+    router_2:
+     type: tosca.nodes.nfv.doctor.VNF
+     properties:
+        id: 2
+        vendor: orange
+        version: 1.0
+     requirements:
+        - VDU: VDU2
+
+    router_3:
+      type: tosca.nodes.nfv.doctor.VNF
+      properties:
+        id: 3
+        vendor: orange
+        version: 1.0
+      requirements:
+        - VDU: VDU3
+
+
+    router_4:
+     type: tosca.nodes.nfv.doctor.VNF
+     properties:
+        id: 4
+        vendor: orange
+        version: 1.0
+     requirements:
+        - VDU: VDU4
+
+    router_5:
+      type: tosca.nodes.nfv.doctor.VNF
+      properties:
+        id: 5
+        vendor: orange
+        version: 1.0
+      requirements:
+        - VDU: VDU5
+
+
+    router_6:
+     type: tosca.nodes.nfv.doctor.VNF
+     properties:
+        id: 6
+        vendor: orange
+        version: 1.0
+     requirements:
+        - VDU: VDU6
+
+    router_7:
+      type: tosca.nodes.nfv.doctor.VNF
+      properties:
+        id: 7
+        vendor: orange
+        version: 1.0
+      requirements:
+        - VDU: VDU7
+
+
+    router_8:
+     type: tosca.nodes.nfv.doctor.VNF
+     properties:
+        id: 8
+        vendor: orange
+        version: 1.0
+     requirements:
+        - VDU: VDU8
+
+
+##########################################################################
+ # Virtual Deployment Units
+##########################################################################
+
+    VDU1:
+      type: tosca.nodes.nfv.doctor.VDU
+      properties:
+        name: VDU1
+        sw_image: maouadj/ndn_router:v2
+        config: /doctor/launch_nfd_router.sh
+        flavor: medium
+        placement_policy: ['popLocation==uk']
+
+    VDU2:
+      type: tosca.nodes.nfv.doctor.VDU
+      properties:
+        name: VDU2
+        sw_image: maouadj/ndn_router:v2
+        config: /doctor/launch_nfd_router.sh
+        flavor: medium
+        placement_policy: ['popLocation==uk']
+    VDU3:
+      type: tosca.nodes.nfv.doctor.VDU
+      properties:
+        name: VDU3
+        sw_image: maouadj/ndn_router:v2
+        config: /doctor/launch_nfd_router.sh
+        flavor: medium
+        placement_policy: ['popLocation==spain']
+
+    VDU4:
+      type: tosca.nodes.nfv.doctor.VDU
+      properties:
+        name: VDU4
+        sw_image: maouadj/ndn_router:v2
+        config: /doctor/launch_nfd_router.sh
+        flavor: medium
+        placement_policy: ['popLocation==netherlands']
+
+    VDU5:
+      type: tosca.nodes.nfv.doctor.VDU
+      properties:
+        name: VDU5
+        sw_image: maouadj/ndn_router:v2
+        config: /doctor/launch_nfd_router.sh
+        flavor: medium
+        placement_policy: ['popLocation==netherlands']
+
+    VDU6:
+      type: tosca.nodes.nfv.doctor.VDU
+      properties:
+        name: VDU6
+        sw_image: maouadj/ndn_router:v2
+        config: /doctor/launch_nfd_router.sh
+        flavor: medium
+        placement_policy: ['popLocation==spain']
+    VDU7:
+      type: tosca.nodes.nfv.doctor.VDU
+      properties:
+        name: VDU7
+        sw_image: maouadj/ndn_router:v2
+        config: /doctor/launch_nfd_router.sh
+        flavor: medium
+        placement_policy: ['popLocation==germany']
+
+    VDU8:
+      type: tosca.nodes.nfv.doctor.VDU
+      properties:
+        name: VDU8
+        sw_image: maouadj/ndn_router:v2
+        config: /doctor/launch_nfd_router.sh
+        flavor: medium
+        placement_policy: ['popLocation==germany']

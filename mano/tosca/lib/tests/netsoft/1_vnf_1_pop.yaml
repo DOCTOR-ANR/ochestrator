@@ -1,0 +1,42 @@
+imports:
+  - data.yaml
+  - doctor_nodes.yaml
+
+tosca_definitions_version: tosca_simple_profile_for_nfv_1_0_0
+
+description: Template for deploying DOCTOR's security use case.
+
+metadata:
+  template_name: security_policies_example
+
+topology_template:
+  node_templates:
+
+##########################################################################
+ # Virtual Network Functions
+##########################################################################
+
+    router_1:
+      type: tosca.nodes.nfv.doctor.VNF
+      properties:
+        id: 1
+        vendor: orange
+        version: 1.0
+      requirements:
+        - VDU: VDU1
+
+
+##########################################################################
+ # Virtual Deployment Units
+##########################################################################
+
+    VDU1:
+      type: tosca.nodes.nfv.doctor.VDU
+      properties:
+        name: VDU1
+        sw_image: maouadj/ndn_router:v2
+        config: /doctor/launch_nfd_router.sh
+        flavor: medium
+        placement_policy: ['popLocation==uk']
+
+

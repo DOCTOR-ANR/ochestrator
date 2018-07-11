@@ -1,0 +1,2 @@
+[INFO] 2 keys have been loaded
+[INFO] master face with ID = 1 listening on tcp://0.0.0.0:6362

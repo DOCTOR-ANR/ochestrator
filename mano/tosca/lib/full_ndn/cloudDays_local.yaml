@@ -1,0 +1,731 @@
+imports:
+  - data.yaml
+  - doctor_nodes.yaml
+
+tosca_definitions_version: tosca_simple_profile_for_nfv_1_0_0
+
+description: Template for deploying a single server with predefined properties.
+
+metadata:
+  template_name: TOSCA NFV toy example
+
+topology_template:
+  node_templates:
+
+    paris_ingress_gw:
+      type: tosca.nodes.nfv.doctor.VNF
+      properties:
+        id: 1
+        ndn_name: /http/paris_igw
+        vendor: orange
+        version: 1.0
+      requirements:
+        - VDU: VDU1
+
+    paris_router:
+      type: tosca.nodes.nfv.doctor.VNF
+      properties:
+        id: 2
+        vendor: orange
+        version: 1.0
+      requirements:
+        - VDU: VDU2
+
+    paris_egress_gw:
+      type: tosca.nodes.nfv.doctor.VNF
+      properties:
+        id: 3
+        ndn_name: /http/fr
+        vendor: orange
+        version: 1.0
+      requirements:
+        - VDU: VDU3
+
+    amsterdam_ingress_gw:
+      type: tosca.nodes.nfv.doctor.VNF
+      properties:
+        id: 4
+        ndn_name: /http/amsterdam_igw
+        vendor: orange
+        version: 1.0
+      requirements:
+        - VDU: VDU4
+
+    amsterdam_router:
+      type: tosca.nodes.nfv.doctor.VNF
+      properties:
+        id: 5
+        vendor: orange
+        version: 1.0
+      requirements:
+        - VDU: VDU5
+
+    amsterdam_egress_gw:
+      type: tosca.nodes.nfv.doctor.VNF
+      properties:
+        id: 6
+        ndn_name: /http/nl
+        vendor: orange
+        version: 1.0
+      requirements:
+        - VDU: VDU6
+
+    berlin_ingress_gw:
+      type: tosca.nodes.nfv.doctor.VNF
+      properties:
+        id: 7
+        ndn_name: /http/berlin_igw
+        vendor: orange
+        version: 1.0
+      requirements:
+        - VDU: VDU7
+
+    berlin_router:
+      type: tosca.nodes.nfv.doctor.VNF
+      properties:
+        id: 8
+        vendor: orange
+        version: 1.0
+      requirements:
+        - VDU: VDU8
+
+    berlin_egress_gw:
+      type: tosca.nodes.nfv.doctor.VNF
+      properties:
+        id: 9
+        ndn_name: /http/de
+        vendor: orange
+        version: 1.0
+      requirements:
+        - VDU: VDU9
+
+    VDU1:
+      type: tosca.nodes.nfv.doctor.VDU
+      properties:
+        name: VDU1
+        sw_image: maouadj/ingress_gw
+        config: /doctor/lauch_ingress_gateway.sh
+        service_port: 3666
+        flavor: medium
+        placement_policy: ['localisation == France']
+
+    VDU2:
+      type: tosca.nodes.nfv.doctor.VDU
+      properties:
+        name: VDU2
+        sw_image: maouadj/ndn_router
+        config: /doctor/launch_nfd_router.sh
+        flavor: medium
+        placement_policy: ['localisation == France']
+
+    VDU3:
+      type: tosca.nodes.nfv.doctor.VDU
+      properties:
+        name: VDU3
+        sw_image: maouadj/egress_gw
+        config: /doctor/launch_egress_gateway.sh
+        flavor: medium
+        placement_policy: ['localisation == France']
+
+    VDU4:
+      type: tosca.nodes.nfv.doctor.VDU
+      properties:
+        name: VDU4
+        sw_image: maouadj/ingress_gw
+        config: /doctor/lauch_ingress_gateway.sh
+        service_port: 3777
+        flavor: medium
+        placement_policy: ['localisation == France']
+
+    VDU5:
+      type: tosca.nodes.nfv.doctor.VDU
+      properties:
+        name: VDU5
+        sw_image: maouadj/ndn_router
+        config: /doctor/launch_nfd_router.sh
+        flavor: medium
+        placement_policy: ['localisation == France']
+
+    VDU6:
+      type: tosca.nodes.nfv.doctor.VDU
+      properties:
+        name: VDU6
+        sw_image: maouadj/egress_gw
+        config: /doctor/launch_egress_gateway.sh
+        flavor: medium
+        placement_policy: ['localisation == France']
+
+
+    VDU7:
+      type: tosca.nodes.nfv.doctor.VDU
+      properties:
+        name: VDU7
+        sw_image: maouadj/ingress_gw
+        config: /doctor/lauch_ingress_gateway.sh
+        service_port: 3888
+        flavor: medium
+        placement_policy: ['localisation == France']
+
+    VDU8:
+      type: tosca.nodes.nfv.doctor.VDU
+      properties:
+        name: VDU8
+        sw_image: maouadj/ndn_router
+        config: /doctor/launch_nfd_router.sh
+        flavor: medium
+        placement_policy: ['localisation == France']
+
+    VDU9:
+      type: tosca.nodes.nfv.doctor.VDU
+      properties:
+        name: VDU9
+        sw_image: maouadj/egress_gw
+        config: /doctor/launch_egress_gateway.sh
+        flavor: medium
+        placement_policy: ['localisation == France']
+
+    CP10:
+      type: tosca.nodes.nfv.doctor.Cpd
+      properties:
+        name: CP10
+        layer_protocol: VXLAN
+      requirements:
+        - virtual_link: VL1
+        - virtual_binding: VDU2
+
+    CP11:
+      type: tosca.nodes.nfv.doctor.Cpd
+      properties:
+        name: CP11
+        layer_protocol: VXLAN
+      requirements:
+        - virtual_link: VL1
+        - virtual_binding: VDU1
+
+    CP12:
+      type: tosca.nodes.nfv.doctor.Cpd
+      properties:
+        name: CP12
+        layer_protocol: VXLAN
+      requirements:
+        - virtual_link: VL2
+        - virtual_binding: VDU2
+
+    CP13:
+      type: tosca.nodes.nfv.doctor.Cpd
+      properties:
+        name: CP13
+        layer_protocol: VXLAN
+      requirements:
+        - virtual_link: VL2
+        - virtual_binding: VDU3
+
+    CP20:
+      type: tosca.nodes.nfv.doctor.Cpd
+      properties:
+        name: CP20
+        layer_protocol: VXLAN
+      requirements:
+        - virtual_link: VL3
+        - virtual_binding: VDU8
+
+    CP21:
+      type: tosca.nodes.nfv.doctor.Cpd
+      properties:
+        name: CP21
+        layer_protocol: VXLAN
+      requirements:
+        - virtual_link: VL3
+        - virtual_binding: VDU7
+
+    CP22:
+      type: tosca.nodes.nfv.doctor.Cpd
+      properties:
+        name: CP22
+        layer_protocol: VXLAN
+      requirements:
+        - virtual_link: VL4
+        - virtual_binding: VDU8
+
+    CP23:
+      type: tosca.nodes.nfv.doctor.Cpd
+      properties:
+        name: CP23
+        layer_protocol: VXLAN
+      requirements:
+        - virtual_link: VL4
+        - virtual_binding: VDU9
+
+    CP30:
+      type: tosca.nodes.nfv.doctor.Cpd
+      properties:
+        name: CP30
+        layer_protocol: VXLAN
+      requirements:
+        - virtual_link: VL5
+        - virtual_binding: VDU5
+
+    CP31:
+      type: tosca.nodes.nfv.doctor.Cpd
+      properties:
+        name: CP31
+        layer_protocol: VXLAN
+      requirements:
+        - virtual_link: VL5
+        - virtual_binding: VDU4
+
+    CP32:
+      type: tosca.nodes.nfv.doctor.Cpd
+      properties:
+        name: CP32
+        layer_protocol: VXLAN
+      requirements:
+        - virtual_link: VL6
+        - virtual_binding: VDU5
+
+    CP33:
+      type: tosca.nodes.nfv.doctor.Cpd
+      properties:
+        name: CP33
+        layer_protocol: VXLAN
+      requirements:
+        - virtual_link: VL6
+        - virtual_binding: VDU6
+
+    CP14:
+      type: tosca.nodes.nfv.doctor.Cpd
+      properties:
+        name: CP14
+        layer_protocol: VXLAN
+      requirements:
+        - virtual_link: VL7
+        - virtual_binding: VDU2
+
+    CP34:
+      type: tosca.nodes.nfv.doctor.Cpd
+      properties:
+        name: CP34
+        layer_protocol: VXLAN
+      requirements:
+        - virtual_link: VL7
+        - virtual_binding: VDU5
+
+    CP24:
+      type: tosca.nodes.nfv.doctor.Cpd
+      properties:
+        name: CP24
+        layer_protocol: VXLAN
+      requirements:
+        - virtual_link: VL8
+        - virtual_binding: VDU8
+
+    CP35:
+      type: tosca.nodes.nfv.doctor.Cpd
+      properties:
+        name: CP10
+        layer_protocol: VXLAN
+      requirements:
+        - virtual_link: VL8
+        - virtual_binding: VDU5
+
+    VL1:
+      type: tosca.nodes.nfv.doctor.VnfVirtualLinkDesc
+      properties:
+        name: VL1
+        connectivity_type: VXLAN
+
+    VL2:
+      type: tosca.nodes.nfv.doctor.VnfVirtualLinkDesc
+      properties:
+        name: VL2
+        connectivity_type: VXLAN
+
+    VL3:
+      type: tosca.nodes.nfv.doctor.VnfVirtualLinkDesc
+      properties:
+        name: VL3
+        connectivity_type: VXLAN
+
+    VL4:
+      type: tosca.nodes.nfv.doctor.VnfVirtualLinkDesc
+      properties:
+        name: VL4
+        connectivity_type: VXLAN
+
+    VL5:
+      type: tosca.nodes.nfv.doctor.VnfVirtualLinkDesc
+      properties:
+        name: VL5
+        connectivity_type: VXLAN
+
+    VL6:
+      type: tosca.nodes.nfv.doctor.VnfVirtualLinkDesc
+      properties:
+        name: VL6
+        connectivity_type: VXLAN
+
+    VL7:
+      type: tosca.nodes.nfv.doctor.VnfVirtualLinkDesc
+      properties:
+        name: VL7
+        connectivity_type: VXLAN
+
+    VL8:
+      type: tosca.nodes.nfv.doctor.VnfVirtualLinkDesc
+      properties:
+        name: VL8
+        connectivity_type: VXLAN
+
+##########################################################################
+ # Forwarding paths
+##########################################################################
+
+
+    DE_ingress_to_FR_egress:
+      type: tosca.nodes.nfv.doctor.FP
+      description: creates path for /http/fr from de_ingress_gw prefix
+      properties:
+        id: 1
+        policy:
+          type: NDN
+          prefix: [/http/fr]
+        path:
+          - forwarder: berlin_ingress_gw
+            capability: CP21
+          - forwarder: berlin_router
+            capability: CP20
+          - forwarder: berlin_router
+            capability: CP24
+          - forwarder: amsterdam_router
+            capability: CP35
+          - forwarder: amsterdam_router
+            capability: CP34
+          - forwarder: paris_router
+            capability: CP14
+          - forwarder: paris_router
+            capability: CP12
+          - forwarder: paris_egress_gw
+            capability: CP13
+
+    FR_egress_to_DE_ingress:
+      type: tosca.nodes.nfv.doctor.FP
+      description: creates path for /http/berlin_ingress_gw from fr_egress_gw
+      properties:
+        id: 2
+        policy:
+          type: NDN
+          prefix: [/http/berlin_igw]
+        path:
+          - forwarder: paris_egress_gw
+            capability: CP13
+          - forwarder: paris_router
+            capability: CP12
+          - forwarder: paris_router
+            capability: CP14
+          - forwarder: amsterdam_router
+            capability: CP34
+          - forwarder: amsterdam_router
+            capability: CP35
+          - forwarder: berlin_router
+            capability: CP24
+          - forwarder: berlin_router
+            capability: CP20
+          - forwarder: berlin_ingress_gw
+            capability: CP21
+
+    FR_ingress_to_DE_egress:
+      type: tosca.nodes.nfv.doctor.FP
+      description: creates path for /http/de from fr_ingress_gw
+      properties:
+        id: 3
+        policy:
+          type: NDN
+          prefix: [/http/de]
+        path:
+          - forwarder: paris_ingress_gw
+            capability: CP11
+          - forwarder: paris_router
+            capability: CP10
+          - forwarder: paris_router
+            capability: CP14
+          - forwarder: amsterdam_router
+            capability: CP34
+          - forwarder: amsterdam_router
+            capability: CP35
+          - forwarder: berlin_router
+            capability: CP24
+          - forwarder: berlin_router
+            capability: CP22
+          - forwarder: berlin_egress_gw
+            capability: CP23
+
+    DE_egress_to_FR_ingress:
+      type: tosca.nodes.nfv.doctor.FP
+      description: creates path for /http/paris_ingress_gw from de_egress_gw
+      properties:
+        id: 4
+        policy:
+          type: NDN
+          prefix: [/http/paris_igw]
+        path:
+          - forwarder: berlin_egress_gw
+            capability: CP23
+          - forwarder: berlin_router
+            capability: CP22
+          - forwarder: berlin_router
+            capability: CP24
+          - forwarder: amsterdam_router
+            capability: CP35
+          - forwarder: amsterdam_router
+            capability: CP34
+          - forwarder: paris_router
+            capability: CP14
+          - forwarder: paris_router
+            capability: CP10
+          - forwarder: paris_ingress_gw
+            capability: CP11
+            
+    FR_ingress_to_NL_egress:
+      type: tosca.nodes.nfv.doctor.FP
+      description: creates path for /http/NL from fr_ingress_gw
+      properties:
+        id: 5
+        policy:
+          type: NDN
+          prefix: [/http/nl]
+        path:
+          - forwarder: paris_ingress_gw
+            capability: CP11
+          - forwarder: paris_router
+            capability: CP10
+          - forwarder: paris_router
+            capability: CP14
+          - forwarder: amsterdam_router
+            capability: CP34
+          - forwarder: amsterdam_router
+            capability: CP32
+          - forwarder: amsterdam_egress_gw
+            capability: CP33
+            
+    NL_egress_to_FR_ingress:
+      type: tosca.nodes.nfv.doctor.FP
+      description: creates path for /http/paris_ingress_gw from nl_egress_gw
+      properties:
+        id: 6
+        policy:
+          type: NDN
+          prefix: [/http/paris_igw]
+        path:
+          - forwarder: amsterdam_egress_gw
+            capability: CP33
+          - forwarder: amsterdam_router
+            capability: CP32
+
+    DE_ingress_to_NL_egress:
+      type: tosca.nodes.nfv.doctor.FP
+      description: creates path for /http/nl from de_ingress_gw prefix
+      properties:
+        id: 7
+        policy:
+          type: NDN
+          prefix: [/http/nl]
+        path:
+          - forwarder: berlin_ingress_gw
+            capability: CP21
+          - forwarder: berlin_router
+            capability: CP20
+          - forwarder: berlin_router
+            capability: CP24
+          - forwarder: amsterdam_router
+            capability: CP35
+
+    NL_egress_to_DE_ingress:
+      type: tosca.nodes.nfv.doctor.FP
+      description: creates path for /http/berlin_ingress_gw from nl_egress_gw
+      properties:
+        id: 8
+        policy:
+          type: NDN
+          prefix: [/http/berlin_igw]
+        path:
+          - forwarder: amsterdam_egress_gw
+            capability: CP33
+          - forwarder: amsterdam_router
+            capability: CP32
+
+    NL_ingress_to_DE_egress:
+      type: tosca.nodes.nfv.doctor.FP
+      description: creates path for /http/de from nl_ingress_gw
+      properties:
+        id: 9
+        policy:
+          type: NDN
+          prefix: [/http/de]
+        path:
+          - forwarder: amsterdam_ingress_gw
+            capability: CP31
+          - forwarder: amsterdam_router
+            capability: CP30
+
+    DE_egress_to_NL_ingress:
+      type: tosca.nodes.nfv.doctor.FP
+      description: creates path for /http/amsterdam_ingress_gw from de_egress_gw
+      properties:
+        id: 10
+        policy:
+          type: NDN
+          prefix: [/http/amsterdam_igw]
+        path:
+          - forwarder: berlin_egress_gw
+            capability: CP23
+          - forwarder: berlin_router
+            capability: CP22
+          - forwarder: berlin_router
+            capability: CP24
+          - forwarder: amsterdam_router
+            capability: CP35
+          - forwarder: amsterdam_router
+            capability: CP30
+          - forwarder: amsterdam_ingress_gw
+            capability: CP31
+
+    NL_ingress_to_FR_egress:
+      type: tosca.nodes.nfv.doctor.FP
+      description: creates path for /http/fr from nl_ingress_gw
+      properties:
+        id: 11
+        policy:
+          type: NDN
+          prefix: [/http/fr]
+        path:
+          - forwarder: amsterdam_ingress_gw
+            capability: CP31
+          - forwarder: amsterdam_router
+            capability: CP30
+
+    FR_egress_to_NL_ingress:
+      type: tosca.nodes.nfv.doctor.FP
+      description: creates path for /http/amsterdam_ingress_gw from fr_egress_gw
+      properties:
+        id: 12
+        policy:
+          type: NDN
+          prefix: [/http/amsterdam_igw]
+        path:
+          - forwarder: paris_egress_gw
+            capability: CP13
+          - forwarder: paris_router
+            capability: CP12
+          - forwarder: paris_router
+            capability: CP14
+          - forwarder: amsterdam_router
+            capability: CP34
+
+    FR_ingress_to_FR_egress:
+      type: tosca.nodes.nfv.doctor.FP
+      description: creates path for /http/fr from fr_ingress_gw
+      properties:
+        id: 13
+        policy:
+          type: NDN
+          prefix: [/http/fr]
+        path:
+          - forwarder: paris_ingress_gw
+            capability: CP11
+          - forwarder: paris_router
+            capability: CP10
+
+    FR_egress_to_FR_ingress:
+      type: tosca.nodes.nfv.doctor.FP
+      description: creates path for /http/paris_igw from fr_egress_gw
+      properties:
+        id: 14
+        policy:
+          type: NDN
+          prefix: [/http/paris_igw]
+        path:
+          - forwarder: paris_egress_gw
+            capability: CP13
+          - forwarder: paris_router
+            capability: CP12
+
+    DE_ingress_to_DE_egress:
+      type: tosca.nodes.nfv.doctor.FP
+      description: creates path for /http/de from de_ingress_gw
+      properties:
+        id: 15
+        policy:
+          type: NDN
+          prefix: [/http/de]
+        path:
+          - forwarder: berlin_ingress_gw
+            capability: CP21
+          - forwarder: berlin_router
+            capability: CP20
+
+    DE_egress_to_DE_ingress:
+      type: tosca.nodes.nfv.doctor.FP
+      description: creates path for /http/berlin_igw from de_egress_gw
+      properties:
+        id: 16
+        policy:
+          type: NDN
+          prefix: [/http/berlin_igw]
+        path:
+          - forwarder: berlin_egress_gw
+            capability: CP23
+          - forwarder: berlin_router
+            capability: CP22
+
+    NL_ingress_to_NL_egress:
+      type: tosca.nodes.nfv.doctor.FP
+      description: creates path for /http/fr from de_ingress_gw
+      properties:
+        id: 17
+        policy:
+          type: NDN
+          prefix: [/http/nl]
+        path:
+          - forwarder: amsterdam_ingress_gw
+            capability: CP31
+          - forwarder: amsterdam_router
+            capability: CP30
+
+    NL_egress_to_NL_ingress:
+      type: tosca.nodes.nfv.doctor.FP
+      description: creates path for /http/amsterdam_igw from nl_ingress_gw
+      properties:
+        id: 18
+        policy:
+          type: NDN
+          prefix: [/http/amsterdam_igw]
+        path:
+          - forwarder: amsterdam_egress_gw
+            capability: CP33
+          - forwarder: amsterdam_router
+            capability: CP32
+
+
+##########################################################################
+ # Forwarding graph
+##########################################################################
+
+  groups:
+    VNFFG1:
+      type: tosca.groups.nfv.doctor.VNFFG
+      description: FR and COM interest to egress_gw
+      properties:
+        vendor: Doctor
+        version: 1.0
+        dependent_virtual_link: [VL1, VL2, VL3, VL4, VL5, VL6, VL7, VL8]
+        connection_point: [CP10, CP11, CP12, CP13, CP14, CP20, CP21, CP22, CP23, CP24, CP30, CP31, CP32, CP33, CP34, CP35]
+        constituent_vnfs: [paris_egress_gw, paris_router, amsterdam_router, berlin_router, berlin_ingress_gw, paris_ingress_gw, berlin_egress_gw, amsterdam_ingress_gw, amsterdam_egress_gw]
+      members: [DE_ingress_to_FR_egress, FR_egress_to_DE_ingress,
+      FR_ingress_to_DE_egress, DE_egress_to_FR_ingress,
+      FR_ingress_to_NL_egress, NL_egress_to_FR_ingress,
+      DE_ingress_to_NL_egress, NL_egress_to_DE_ingress,
+      NL_ingress_to_DE_egress, DE_egress_to_NL_ingress,
+      NL_ingress_to_FR_egress, FR_egress_to_NL_ingress,
+      FR_ingress_to_FR_egress, FR_egress_to_FR_ingress,
+      DE_ingress_to_DE_egress, DE_egress_to_DE_ingress,
+      NL_ingress_to_NL_egress, NL_egress_to_NL_ingress]

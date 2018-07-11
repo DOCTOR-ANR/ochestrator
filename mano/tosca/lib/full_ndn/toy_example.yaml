@@ -1,0 +1,156 @@
+imports:
+  - data.yaml
+  - doctor_nodes.yaml
+
+tosca_definitions_version: tosca_simple_profile_for_nfv_1_0_0
+
+description: Template for deploying a single server with predefined properties.
+
+metadata:
+  template_name: TOSCA NFV toy example
+
+topology_template:
+  node_templates:
+
+    ingress_gw:
+      type: tosca.nodes.nfv.doctor.VNF
+      properties:
+        id: 1
+        ndn_name: /http/dz_ingress_gw
+        vendor: orange
+        version: 1.0
+      requirements:
+        - VDU: VDU1
+
+    nfd_router:
+      type: tosca.nodes.nfv.doctor.VNF
+      properties:
+        id: 2
+        vendor: orange
+        version: 1.0
+      requirements:
+        - VDU: VDU2
+
+    egress_gw:
+      type: tosca.nodes.nfv.doctor.VNF
+      properties:
+        ndn_name: /http/dz
+        id: 3
+        vendor: orange
+        version: 1.0
+      requirements:
+        - VDU: VDU3
+
+    VDU1:
+      type: tosca.nodes.nfv.doctor.VDU
+      properties:
+        name: VDU1
+        sw_image: maouadj/ingress_gw
+        config: /doctor/lauch_ingress_gateway.sh
+        service_port: 8080
+        flavor: medium
+        placement_policy: ['localisation == France']
+
+    VDU2:
+      type: tosca.nodes.nfv.doctor.VDU
+      properties:
+        name: VDU2
+        sw_image: maouadj/ndn_router
+        config: /doctor/launch_nfd_router.sh
+        flavor: medium
+        placement_policy: ['localisation == France']
+
+    VDU3:
+      type: tosca.nodes.nfv.doctor.VDU
+      properties:
+        name: VDU3
+        sw_image: maouadj/egress_gw
+        config: /doctor/launch_egress_gateway.sh
+        flavor: medium
+        placement_policy: ['localisation == France']
+
+    CP10:
+      type: tosca.nodes.nfv.doctor.Cpd
+      properties:
+        name: CP10
+        layer_protocol: VXLAN
+      requirements:
+        - virtual_link: VL1
+        - virtual_binding: VDU1
+
+
+    CP20:
+      type: tosca.nodes.nfv.doctor.Cpd
+      properties:
+        name: CP20
+        layer_protocol: VXLAN
+      requirements:
+        - virtual_link: VL1
+        - virtual_binding: VDU2
+
+    CP21:
+      type: tosca.nodes.nfv.doctor.Cpd
+      properties:
+        name: CP21
+        layer_protocol: VXLAN
+      requirements:
+        - virtual_link: VL2
+        - virtual_binding: VDU2
+
+    CP30:
+      type: tosca.nodes.nfv.doctor.Cpd
+      properties:
+        name: CP30
+        layer_protocol: VXLAN
+      requirements:
+        - virtual_link: VL2
+        - virtual_binding: VDU3
+
+    VL1:
+      type: tosca.nodes.nfv.doctor.VnfVirtualLinkDesc
+      properties:
+        name: VL1
+        connectivity_type: VXLAN
+
+    VL2:
+      type: tosca.nodes.nfv.doctor.VnfVirtualLinkDesc
+      properties:
+        name: VL2
+        connectivity_type: VXLAN
+
+##########################################################################
+ # Forwarding paths
+##########################################################################
+    video_content:
+      type: tosca.nfv.datatypes.doctor.video
+      prefix: /http/
+      file_format: [mkv, mpeg]
+      cacheable: true
+
+    video_delivery_path:
+      type: tosca.nodes.nfv.doctor.CDP
+      description: delivery path for video content
+      properties:
+        id: 1
+        policy:
+          type: CACL
+          data: [video_content]
+        provides: [ingress_gw]
+        consumers: [egress_gw]
+        fabric: [nfd_router]
+
+##########################################################################
+ # Forwarding graph
+##########################################################################
+
+  groups:
+    VNFFG1:
+      type: tosca.groups.nfv.doctor.VNFFG
+      description: video dist graph
+      properties:
+        vendor: Doctor
+        version: 1.0
+        dependent_virtual_link: [VL1, VL2]
+        connection_point: [CP10, CP20, CP21, CP30]
+        constituent_vnfs: [ingress_gw, nfd_router, egress_gw]
+      members: [video_delivery_path]

@@ -1,0 +1,63 @@
+data_types:
+
+  tosca.nfv.datatypes.doctor.content:
+    properties:
+      prefix:
+        type: string
+        required: true
+      cacheable:
+        type: boolean
+        required: true
+
+  tosca.nfv.datatypes.doctor.video:
+    derived_from: tosca.nfv.datatypes.doctor.content
+    properties:
+      file_format:
+        type: list
+        entry_schema:
+          type: string
+          constraints:
+            - valid_values: [ mkv, flv, avi, wmv, mpg, mpeg ]
+        required: true
+
+  tosca.nfv.datatypes.doctor.audio:
+    derived_from: tosca.nfv.datatypes.doctor.content
+    properties:
+      file_format:
+        type: list
+        entry_schema:
+          type: string
+          constraints:
+            - valid_values: [ mp3, wav ]
+        required: true
+
+  tosca.nfv.datatypes.doctor.text:
+    derived_from: tosca.nfv.datatypes.doctor.content
+    properties:
+      file_format:
+        type: list
+        entry_schema:
+          type: string
+          constraints:
+            - valid_values: [ txt ]
+        required: true
+
+  tosca.nfv.datatypes.doctor.policyType:
+    properties:
+      type:
+        type: string
+        required: true
+
+  tosca.nfv.datatypes.policyType.cacl:
+    derived_from: tosca.nfv.datatypes.doctor.policyType
+    properties:
+      type:
+        type: string
+        required: true
+        constraints:
+          - valid_values: [ CACL ]
+        data:
+          type: list
+          required: true
+          entry_schema:
+            type: tosca.nfv.datatypes.doctor.content

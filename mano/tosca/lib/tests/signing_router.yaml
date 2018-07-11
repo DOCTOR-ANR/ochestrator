@@ -1,0 +1,50 @@
+    - CPA_countermeasure:
+        type: tosca.policies.nfv.doctor.security.signature_verification
+        targets: [peering_router_1, peering_router_2]
+
+        triggers:
+
+          peeringPoint1_verification:
+            event: tosca.nfv.doctor.security.alert.cpa
+            condition:
+              constraint: triggred_by peering_router_1
+            action:
+              action_type: deploy_signing_router
+              signing_router_name: signing_router_1
+              connexion:
+                - ingress: VDU1_VL4_CP
+                  egress: VDU4_VL5_CP
+              placement: ['localisation == France']
+
+          peeringPoint2_verification:
+            event: tosca.nfv.doctor.security.alert.cpa
+            condition:
+              constraint: triggred_by peering_router_2
+            action:
+              action_type: deploy_signing_router
+              signing_router_name: signing_router_2
+              connexion:
+                - ingress: VDU1_VL4_CP
+                  egress: VDU4_VL5_CP
+              placement: ['localisation == France']
+
+   - update_firewall_1:
+        type: tosca.policies.nfv.doctor.ndn.security.update_firewall
+        targets: [signing_router_1, signing_router_2, firewall_1, firewall_2]
+        triggers:
+
+          peering_point_1:
+            event_type: tosca.nfv.doctor.security.alert.poisoned_content
+            condition:
+              constraint: triggred_by signing_router_1
+            action:
+              action_type: update_firewall
+              firewall: firewall_1
+
+          peering_point_2:
+            event_type: tosca.nfv.doctor.security.alert.poisoned_content
+            condition:
+              constraint: triggred_by signing_router_2
+            action:
+              action_type: update_firewall
+              firewall: firewall_2

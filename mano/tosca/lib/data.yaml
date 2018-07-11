@@ -1,0 +1,70 @@
+data_types:
+  tosca.datatypes.nfv.L3AddressData:
+      _extensions:
+        shorthand_name: L3AddressData
+        type_qualified_name: tosca:L3AddressData
+        specification: tosca-simple-nfv-1.0
+        specification_section: 5.3.2
+        specification_url: 'http://docs.oasis-open.org/tosca/tosca-nfv/v1.0/csd04/tosca-nfv-v1.0-csd04.html#_Toc482896056'
+      description: >-
+        The L3AddressData type is a complex TOSCA data type used to describe L3AddressData information
+        element as defined in [ETSI GS NFV-IFA 011], it provides the information on the IP addresses
+        to be assigned to the connection point instantiated from the parent Connection Point
+        Descriptor.
+      derived_from: tosca.datatypes.Root
+      properties:
+        ip_address_assignment:
+          description: >-
+            Specify if the address assignment is the responsibility of management and orchestration
+            function or not. If it is set to True, it is the management and orchestration function
+            responsibility.
+          type: boolean
+          required: true
+        floating_ip_activated:
+          description: Specify if the floating IP scheme is activated on the Connection Point or not.
+          type: boolean
+          required: true
+        ip_address_type:
+          description: >-
+            Define address type. The address type should be aligned with the address type supported by
+            the layer_protocol properties of the parent VnfExtCpd.
+          type: string
+          required: false
+          constraints:
+            - valid_values: [ ipv4, ipv6 ]
+        number_of_ip_address:
+          description: >-
+            Minimum number of IP addresses to be assigned.
+          type: integer
+          required: false
+
+
+  tosca.nfv.datatypes.pathType:
+    properties:
+      forwarder:
+        type: string
+        required: true
+      capability:
+        type: string
+        required: true
+
+  #tosca.nfv.datatypes.interestType:
+  #      properties:
+  #        prefix:
+  #          type: string
+  #          required: true
+          #MinSuffixComponents
+          #MaxSuffixComponents
+
+  tosca.nfv.datatypes.policyType:
+        properties:
+          type:
+            type: string
+            required: false
+            constraints:
+              - valid_values: [ NDN ]
+          prefix:
+            type: list
+            required: true
+            entry_schema:
+              type: string

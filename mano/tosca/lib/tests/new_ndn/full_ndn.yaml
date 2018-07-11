@@ -1,0 +1,69 @@
+
+##########################################################################
+ # content delivery
+##########################################################################
+
+    video_content:
+      type: tosca.nfv.datatypes.doctor.video
+      prefix: /http/
+      file_format: [mkv, mpeg]
+      cacheable: true
+
+    video_delivery_path:
+      type: tosca.nodes.nfv.doctor.CDP
+      description: delivery path for video content
+      properties:
+        id: 1
+        policy:
+          type: CACL
+          data: [video_content]
+        provides: [ingress_gw]
+        consumers: [egress_gw]
+        fabric: [nfd_router]
+
+##########################################################################
+ # policies
+##########################################################################
+policies:
+  -CPA_monitoring_policy:
+    type: tosca.policies.doctor.security
+    triggers:
+      update_firewall:
+        event:
+          type: tosca.events.doctor.security.cpa
+          data: attacker, bad_prefix
+        condition:
+          metrics: [cache_miss, cache_hit]
+          period: 180
+          method: avg
+          constraint:
+            -cache_miss greater_than 50
+            -chache_hit less_than 10
+        action:
+          action1:
+            type: update_firewall
+            target: fr_firewall
+            config:
+              to_add: [list_of_rules]
+              to_remove: [list_of_rules]
+              to_modify: [list_of_rules]
+          action2:
+            type: deploy_firewall
+            # ...
+
+  -auto_scale_policy:
+    type: tosca.policies.doctor.auto_scale
+    triggers:
+      event:
+        type: tosca.events.resource.utilization
+        data: target_vdu
+      condition:
+        metrics: cache_util
+        period: 600
+        method: avg
+        constraint: cache_util greater_than 50%
+      action:
+        action1:
+          type: SCALE_OUT
+          value: 2
+          target: target_vdu

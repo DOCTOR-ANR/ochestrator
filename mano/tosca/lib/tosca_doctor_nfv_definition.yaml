@@ -1,0 +1,9 @@
+imports:
+  - artifacts.yaml
+  - capabilities.yaml
+  - data.yaml
+  - nodes.yaml
+  - groups.yaml
+  - interfaces.yaml
+  - policies.yaml
+  - relationships.yaml

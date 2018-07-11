@@ -1,0 +1,419 @@
+imports:
+  - data.yaml
+  - doctor_nodes.yaml
+
+tosca_definitions_version: tosca_simple_profile_for_nfv_1_0_0
+
+description: Template for deploying a single server with predefined properties.
+
+metadata:
+  template_name: TOSCA NFV toy example
+
+topology_template:
+  node_templates:
+
+    paris_ingress_gw:
+      type: tosca.nodes.nfv.doctor.VNF
+      properties:
+        id: 1
+        ndn_name: /http/paris_igw
+        vendor: orange
+        version: 1.0
+      requirements:
+        - VDU: VDU1
+
+    paris_router:
+      type: tosca.nodes.nfv.doctor.VNF
+      properties:
+        id: 2
+        vendor: orange
+        version: 1.0
+      requirements:
+        - VDU: VDU2
+
+    paris_egress_gw:
+      type: tosca.nodes.nfv.doctor.VNF
+      properties:
+        id: 3
+        ndn_name: /http/fr
+        vendor: orange
+        version: 1.0
+      requirements:
+        - VDU: VDU3
+
+    amsterdam_ingress_gw:
+      type: tosca.nodes.nfv.doctor.VNF
+      properties:
+        id: 4
+        ndn_name: /http/amsterdam_igw
+        vendor: orange
+        version: 1.0
+      requirements:
+        - VDU: VDU4
+
+    amsterdam_router:
+      type: tosca.nodes.nfv.doctor.VNF
+      properties:
+        id: 5
+        vendor: orange
+        version: 1.0
+      requirements:
+        - VDU: VDU5
+
+    amsterdam_egress_gw:
+      type: tosca.nodes.nfv.doctor.VNF
+      properties:
+        id: 6
+        ndn_name: /http/nl
+        vendor: orange
+        version: 1.0
+      requirements:
+        - VDU: VDU6
+
+    berlin_ingress_gw:
+      type: tosca.nodes.nfv.doctor.VNF
+      properties:
+        id: 7
+        ndn_name: /http/berlin_igw
+        vendor: orange
+        version: 1.0
+      requirements:
+        - VDU: VDU7
+
+    berlin_router:
+      type: tosca.nodes.nfv.doctor.VNF
+      properties:
+        id: 8
+        vendor: orange
+        version: 1.0
+      requirements:
+        - VDU: VDU8
+
+    berlin_egress_gw:
+      type: tosca.nodes.nfv.doctor.VNF
+      properties:
+        id: 9
+        ndn_name: /http/de
+        vendor: orange
+        version: 1.0
+      requirements:
+        - VDU: VDU9
+
+    VDU1:
+      type: tosca.nodes.nfv.doctor.VDU
+      properties:
+        name: VDU1
+        sw_image: maouadj/ingress_gw
+        config: /doctor/lauch_ingress_gateway.sh
+        service_port: 3666
+        flavor: medium
+        placement_policy: ['popLocation==france']
+
+    VDU2:
+      type: tosca.nodes.nfv.doctor.VDU
+      properties:
+        name: VDU2
+        sw_image: maouadj/ndn_router
+        config: /doctor/launch_nfd_router.sh
+        flavor: medium
+        placement_policy: ['popLocation==france']
+
+    VDU3:
+      type: tosca.nodes.nfv.doctor.VDU
+      properties:
+        name: VDU3
+        sw_image: maouadj/egress_gw
+        config: /doctor/launch_egress_gateway.sh
+        flavor: medium
+        placement_policy: ['popLocation==france']
+
+    VDU4:
+      type: tosca.nodes.nfv.doctor.VDU
+      properties:
+        name: VDU4
+        sw_image: maouadj/ingress_gw
+        config: /doctor/lauch_ingress_gateway.sh
+        service_port: 3777
+        flavor: medium
+        placement_policy: ['popLocation==netherlands']
+
+    VDU5:
+      type: tosca.nodes.nfv.doctor.VDU
+      properties:
+        name: VDU5
+        sw_image: maouadj/ndn_router
+        config: /doctor/launch_nfd_router.sh
+        flavor: medium
+        placement_policy: ['popLocation==netherlands']
+
+    VDU6:
+      type: tosca.nodes.nfv.doctor.VDU
+      properties:
+        name: VDU6
+        sw_image: maouadj/egress_gw
+        config: /doctor/launch_egress_gateway.sh
+        flavor: medium
+        placement_policy: ['popLocation==netherlands']
+
+
+    VDU7:
+      type: tosca.nodes.nfv.doctor.VDU
+      properties:
+        name: VDU7
+        sw_image: maouadj/ingress_gw
+        config: /doctor/lauch_ingress_gateway.sh
+        service_port: 3888
+        flavor: medium
+        placement_policy: ['popLocation==germany']
+
+    VDU8:
+      type: tosca.nodes.nfv.doctor.VDU
+      properties:
+        name: VDU8
+        sw_image: maouadj/ndn_router
+        config: /doctor/launch_nfd_router.sh
+        flavor: medium
+        placement_policy: ['popLocation==germany']
+
+    VDU9:
+      type: tosca.nodes.nfv.doctor.VDU
+      properties:
+        name: VDU9
+        sw_image: maouadj/egress_gw
+        config: /doctor/launch_egress_gateway.sh
+        flavor: medium
+        placement_policy: ['popLocation==germany']
+
+    CP10:
+      type: tosca.nodes.nfv.doctor.Cpd
+      properties:
+        name: CP10
+        layer_protocol: VXLAN
+      requirements:
+        - virtual_link: VL1
+        - virtual_binding: VDU2
+
+    CP11:
+      type: tosca.nodes.nfv.doctor.Cpd
+      properties:
+        name: CP11
+        layer_protocol: VXLAN
+      requirements:
+        - virtual_link: VL1
+        - virtual_binding: VDU1
+
+    CP12:
+      type: tosca.nodes.nfv.doctor.Cpd
+      properties:
+        name: CP12
+        layer_protocol: VXLAN
+      requirements:
+        - virtual_link: VL2
+        - virtual_binding: VDU2
+
+    CP13:
+      type: tosca.nodes.nfv.doctor.Cpd
+      properties:
+        name: CP13
+        layer_protocol: VXLAN
+      requirements:
+        - virtual_link: VL2
+        - virtual_binding: VDU3
+
+    CP20:
+      type: tosca.nodes.nfv.doctor.Cpd
+      properties:
+        name: CP20
+        layer_protocol: VXLAN
+      requirements:
+        - virtual_link: VL3
+        - virtual_binding: VDU8
+
+    CP21:
+      type: tosca.nodes.nfv.doctor.Cpd
+      properties:
+        name: CP21
+        layer_protocol: VXLAN
+      requirements:
+        - virtual_link: VL3
+        - virtual_binding: VDU7
+
+    CP22:
+      type: tosca.nodes.nfv.doctor.Cpd
+      properties:
+        name: CP22
+        layer_protocol: VXLAN
+      requirements:
+        - virtual_link: VL4
+        - virtual_binding: VDU8
+
+    CP23:
+      type: tosca.nodes.nfv.doctor.Cpd
+      properties:
+        name: CP23
+        layer_protocol: VXLAN
+      requirements:
+        - virtual_link: VL4
+        - virtual_binding: VDU9
+
+    CP30:
+      type: tosca.nodes.nfv.doctor.Cpd
+      properties:
+        name: CP30
+        layer_protocol: VXLAN
+      requirements:
+        - virtual_link: VL5
+        - virtual_binding: VDU5
+
+    CP31:
+      type: tosca.nodes.nfv.doctor.Cpd
+      properties:
+        name: CP31
+        layer_protocol: VXLAN
+      requirements:
+        - virtual_link: VL5
+        - virtual_binding: VDU4
+
+    CP32:
+      type: tosca.nodes.nfv.doctor.Cpd
+      properties:
+        name: CP32
+        layer_protocol: VXLAN
+      requirements:
+        - virtual_link: VL6
+        - virtual_binding: VDU5
+
+    CP33:
+      type: tosca.nodes.nfv.doctor.Cpd
+      properties:
+        name: CP33
+        layer_protocol: VXLAN
+      requirements:
+        - virtual_link: VL6
+        - virtual_binding: VDU6
+
+    CP14:
+      type: tosca.nodes.nfv.doctor.Cpd
+      properties:
+        name: CP14
+        layer_protocol: VXLAN
+      requirements:
+        - virtual_link: VL7
+        - virtual_binding: VDU2
+
+    CP34:
+      type: tosca.nodes.nfv.doctor.Cpd
+      properties:
+        name: CP34
+        layer_protocol: VXLAN
+      requirements:
+        - virtual_link: VL7
+        - virtual_binding: VDU5
+
+    CP24:
+      type: tosca.nodes.nfv.doctor.Cpd
+      properties:
+        name: CP24
+        layer_protocol: VXLAN
+      requirements:
+        - virtual_link: VL8
+        - virtual_binding: VDU8
+
+    CP35:
+      type: tosca.nodes.nfv.doctor.Cpd
+      properties:
+        name: CP10
+        layer_protocol: VXLAN
+      requirements:
+        - virtual_link: VL8
+        - virtual_binding: VDU5
+
+    VL1:
+      type: tosca.nodes.nfv.doctor.VnfVirtualLinkDesc
+      properties:
+        name: VL1
+        connectivity_type: VXLAN
+
+    VL2:
+      type: tosca.nodes.nfv.doctor.VnfVirtualLinkDesc
+      properties:
+        name: VL2
+        connectivity_type: VXLAN
+
+    VL3:
+      type: tosca.nodes.nfv.doctor.VnfVirtualLinkDesc
+      properties:
+        name: VL3
+        connectivity_type: VXLAN
+
+    VL4:
+      type: tosca.nodes.nfv.doctor.VnfVirtualLinkDesc
+      properties:
+        name: VL4
+        connectivity_type: VXLAN
+
+    VL5:
+      type: tosca.nodes.nfv.doctor.VnfVirtualLinkDesc
+      properties:
+        name: VL5
+        connectivity_type: VXLAN
+
+    VL6:
+      type: tosca.nodes.nfv.doctor.VnfVirtualLinkDesc
+      properties:
+        name: VL6
+        connectivity_type: VXLAN
+
+    VL7:
+      type: tosca.nodes.nfv.doctor.VnfVirtualLinkDesc
+      properties:
+        name: VL7
+        connectivity_type: VXLAN
+
+    VL8:
+      type: tosca.nodes.nfv.doctor.VnfVirtualLinkDesc
+      properties:
+        name: VL8
+        connectivity_type: VXLAN
+
+##########################################################################
+ # content delivery
+##########################################################################
+
+    all_content:
+      type: tosca.nfv.datatypes.doctor.contentType
+      content_type: [all]
+      prefix: /http
+      file_format: [all]
+      cacheable: true
+
+    default_delivery_path:
+      type: tosca.nodes.nfv.doctor.CFP
+      description: delivery path for all content
+      properties:
+        id: 1
+        policy:
+          type: content_ACL
+          data: [all_content]
+        provides: [paris_ingress_gw, amsterdam_ingress_gw, berlin_ingress_gw]
+        consumers: [paris_egress_gw, amsterdam_egress_gw, berlin_egress_gw]
+        fabric: [paris_router, amsterdam_router, berlin_router]
+
+##########################################################################
+ # policies
+##########################################################################
+##########################################################################
+ # Forwarding graph
+##########################################################################
+
+  groups:
+    VNFFG1:
+      type: tosca.groups.nfv.doctor.VNFFG
+      description: FR and COM interest to egress_gw
+      properties:
+        vendor: Doctor
+        version: 1.0
+        dependent_virtual_link: [VL1, VL2, VL3, VL4, VL5, VL6, VL7, VL8]
+        connection_point: [CP10, CP11, CP12, CP13, CP14, CP20, CP21, CP22, CP23, CP24, CP30, CP31, CP32, CP33, CP34, CP35]
+        constituent_vnfs: [paris_egress_gw, paris_router, paris_ingress_gw, amsterdam_router,amsterdam_ingress_gw, amsterdam_egress_gw, berlin_router, berlin_ingress_gw, berlin_egress_gw,]
+      members: [default_delivery_path]

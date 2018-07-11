@@ -1,0 +1,2 @@
+/throughput/KEY/%A0%BD%A8%0F%85%ACyA PEM throughput.pub
+/testname/KEY/DSK-123/ID-CERT DER tan.pub

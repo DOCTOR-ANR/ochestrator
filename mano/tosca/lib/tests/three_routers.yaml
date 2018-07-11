@@ -1,0 +1,119 @@
+imports:
+  - data.yaml
+  - doctor_nodes.yaml
+
+tosca_definitions_version: tosca_simple_profile_for_nfv_1_0_0
+
+description: Template for deploying a single server with predefined properties.
+
+metadata:
+  template_name: TOSCA NFV toy example
+
+topology_template:
+  node_templates:
+
+    router_1:
+      type: tosca.nodes.nfv.doctor.VNF
+      properties:
+        id: 1
+        vendor: orange
+        version: 1.0
+      requirements:
+        - VDU: VDU1
+
+    router_2:
+      type: tosca.nodes.nfv.doctor.VNF
+      properties:
+        id: 2
+        vendor: orange
+        version: 1.0
+      requirements:
+        - VDU: VDU2
+
+    router_3:
+      type: tosca.nodes.nfv.doctor.VNF
+      properties:
+        id: 3
+        vendor: orange
+        version: 1.0
+      requirements:
+        - VDU: VDU3
+
+
+    VDU1:
+      type: tosca.nodes.nfv.doctor.VDU
+      properties:
+        name: VDU1
+        sw_image: maouadj/ndn_router:v1
+        config: sleep infinity
+        flavor: medium
+        placement_policy: ['popLocation == france']
+
+    VDU2:
+      type: tosca.nodes.nfv.doctor.VDU
+      properties:
+        name: VDU2
+        sw_image: maouadj/ndn_router:v1
+        config: sleep infinity
+        flavor: medium
+        placement_policy: ['popLocation == france']
+
+    VDU3:
+      type: tosca.nodes.nfv.doctor.VDU
+      properties:
+        name: VDU3
+        sw_image: maouadj/ndn_router:v1
+        config: sleep infinity
+        flavor: medium
+        placement_policy: ['popLocation == france']
+
+
+    VDU1_VL1_CP:
+      type: tosca.nodes.nfv.doctor.Cpd
+      properties:
+        name: VDU1_VL1_CP
+        layer_protocol: VXLAN
+      requirements:
+        - virtual_link: VL1
+        - virtual_binding: VDU1
+
+    VDU1_VL2_CP:
+      type: tosca.nodes.nfv.doctor.Cpd
+      properties:
+        name: VDU1_VL2_CP
+        layer_protocol: VXLAN
+      requirements:
+        - virtual_link: VL2
+        - virtual_binding: VDU1
+
+    VDU2_VL1_CP:
+      type: tosca.nodes.nfv.doctor.Cpd
+      properties:
+        name: VDU2_VL1_CP
+        layer_protocol: VXLAN
+      requirements:
+        - virtual_link: VL1
+        - virtual_binding: VDU2
+
+    VDU3_VL2_CP:
+      type: tosca.nodes.nfv.doctor.Cpd
+      properties:
+        name: VDU3_VL2_CP
+        layer_protocol: VXLAN
+      requirements:
+        - virtual_link: VL2
+        - virtual_binding: VDU3
+
+
+
+    VL1:
+      type: tosca.nodes.nfv.doctor.VnfVirtualLinkDesc
+      properties:
+        name: VL1
+        connectivity_type: VXLAN
+
+    VL2:
+      type: tosca.nodes.nfv.doctor.VnfVirtualLinkDesc
+      properties:
+        name: VL2
+        connectivity_type: VXLAN

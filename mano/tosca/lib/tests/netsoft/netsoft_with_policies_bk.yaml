@@ -1,0 +1,599 @@
+imports:
+  - data.yaml
+  - doctor_nodes.yaml
+
+tosca_definitions_version: tosca_simple_profile_for_nfv_1_0_0
+
+description: Template for deploying DOCTOR's security use case.
+
+metadata:
+  template_name: security_policies_example
+
+topology_template:
+  node_templates:
+
+##########################################################################
+ # Virtual Network Functions
+##########################################################################
+
+    router_1:
+      type: tosca.nodes.nfv.doctor.VNF
+      properties:
+        id: 1
+        vendor: orange
+        version: 1.0
+      requirements:
+        - VDU: VDU1
+
+    router_2:
+      type: tosca.nodes.nfv.doctor.VNF
+      properties:
+        id: 2
+        vendor: orange
+        version: 1.0
+      requirements:
+        - VDU: VDU2
+
+    router_4:
+      type: tosca.nodes.nfv.doctor.VNF
+      properties:
+        id: 4
+        vendor: orange
+        version: 1.0
+      requirements:
+        - VDU: VDU3
+
+    firewall_1:
+      type: tosca.nodes.nfv.doctor.VNF.firewall
+      properties:
+        id: 6
+        vendor: orange
+        version: 1.0
+        configuration:
+          mode: accept
+          rules:
+            - action: append-drop
+              prefix: [/foo]
+      requirements:
+        - VDU: VDU4
+
+    peering_router_1:
+      type: tosca.nodes.nfv.doctor.VNF
+      properties:
+        id: 8
+        vendor: orange
+        version: 1.0
+      requirements:
+        - VDU: VDU5
+
+    router_3:
+      type: tosca.nodes.nfv.doctor.VNF
+      properties:
+        id: 3
+        vendor: orange
+        version: 1.0
+      requirements:
+        - VDU: VDU6
+
+    router_5:
+      type: tosca.nodes.nfv.doctor.VNF
+      properties:
+        id: 5
+        vendor: orange
+        version: 1.0
+      requirements:
+        - VDU: VDU7
+
+    firewall_2:
+      type: tosca.nodes.nfv.doctor.VNF.firewall
+      properties:
+        id: 7
+        vendor: orange
+        version: 1.0
+        configuration:
+          mode: accept
+          rules:
+            - action: append-drop
+              prefix: [/foo]
+      requirements:
+        - VDU: VDU8
+
+    peering_router_2:
+      type: tosca.nodes.nfv.doctor.VNF
+      properties:
+        id: 9
+        vendor: orange
+        version: 1.0
+      requirements:
+        - VDU: VDU9
+
+    router_x:
+      type: tosca.nodes.nfv.doctor.VNF
+      properties:
+        id: 10
+        vendor: orange
+        version: 1.0
+      requirements:
+        - VDU: VDUX
+
+##########################################################################
+ # Virtual Deployment Units
+##########################################################################
+
+    VDU1:
+      type: tosca.nodes.nfv.doctor.VDU
+      properties:
+        name: VDU1
+        sw_image: maouadj/ndn_router:v2
+        config: /doctor/launch_nfd_router.sh
+        flavor: medium
+        placement_policy: ['popLocation==france']
+
+    VDU2:
+      type: tosca.nodes.nfv.doctor.VDU
+      properties:
+        name: VDU2
+        sw_image: maouadj/ndn_router:v2
+        config: /doctor/launch_nfd_router.sh
+        flavor: medium
+        placement_policy: ['popLocation==france']
+
+    VDU3:
+      type: tosca.nodes.nfv.doctor.VDU
+      properties:
+        name: VDU3
+        sw_image: maouadj/ndn_router:v2
+        config: /doctor/launch_nfd_router.sh
+        flavor: medium
+        placement_policy: ['popLocation==france']
+
+    VDU4:
+      type: tosca.nodes.nfv.doctor.VDU
+      properties:
+        name: VDU4
+        sw_image: maouadj/ndn_firewall:v1
+        config: /doctor/launch_ndn_firewall.sh
+        flavor: medium
+        placement_policy: ['popLocation==france']
+
+    VDU5:
+      type: tosca.nodes.nfv.doctor.VDU
+      properties:
+        name: VDU5
+        sw_image: maouadj/ndn_router:v2
+        config: /doctor/launch_nfd_router.sh
+        flavor: medium
+        placement_policy: ['popLocation==france']
+
+    VDU6:
+      type: tosca.nodes.nfv.doctor.VDU
+      properties:
+        name: VDU6
+        sw_image: maouadj/ndn_router:v2
+        config: /doctor/launch_nfd_router.sh
+        flavor: medium
+        placement_policy: ['popLocation==france']
+
+    VDU7:
+      type: tosca.nodes.nfv.doctor.VDU
+      properties:
+        name: VDU7
+        sw_image: maouadj/ndn_router:v2
+        config: /doctor/launch_nfd_router.sh
+        flavor: medium
+        placement_policy: ['popLocation==france']
+
+    VDU8:
+      type: tosca.nodes.nfv.doctor.VDU
+      properties:
+        name: VDU8
+        sw_image: maouadj/ndn_firewall:v1
+        config: /doctor/launch_ndn_firewall.sh
+        flavor: medium
+        placement_policy: ['popLocation==france']
+
+    VDU9:
+      type: tosca.nodes.nfv.doctor.VDU
+      properties:
+        name: VDU9
+        sw_image: maouadj/ndn_router:v2
+        config: /doctor/launch_nfd_router.sh
+        flavor: medium
+        placement_policy: ['popLocation==france']
+
+    VDUX:
+      type: tosca.nodes.nfv.doctor.VDU
+      properties:
+        name: VDUX
+        sw_image: maouadj/ndn_router:v2
+        config: /doctor/launch_nfd_router.sh
+        flavor: medium
+        placement_policy: ['popLocation==france']
+
+##########################################################################
+ # Connexion Points
+##########################################################################
+
+    VDU1_VL1_CP:
+      type: tosca.nodes.nfv.doctor.Cpd
+      properties:
+        name: VDU1_VL1_CP
+        layer_protocol: VXLAN
+      requirements:
+        - virtual_link: VL1
+        - virtual_binding: VDU1
+
+    VDU2_VL1_CP:
+      type: tosca.nodes.nfv.doctor.Cpd
+      properties:
+        name: VDU2_VL1_CP
+        layer_protocol: VXLAN
+      requirements:
+        - virtual_link: VL1
+        - virtual_binding: VDU2
+
+    VDU2_VL10_CP:
+      type: tosca.nodes.nfv.doctor.Cpd
+      properties:
+        name: VDU2_VL10_CP
+        layer_protocol: VXLAN
+      requirements:
+        - virtual_link: VL10
+        - virtual_binding: VDU2
+
+    VDU2_VL5_CP:
+      type: tosca.nodes.nfv.doctor.Cpd
+      properties:
+        name: VDU2_VL5_CP
+        layer_protocol: VXLAN
+      requirements:
+        - virtual_link: VL5
+        - virtual_binding: VDU2
+
+    VDU3_VL2_CP:
+      type: tosca.nodes.nfv.doctor.Cpd
+      properties:
+        name: VDU3_VL2_CP
+        layer_protocol: VXLAN
+      requirements:
+        - virtual_link: VL2
+        - virtual_binding: VDU3
+
+    VDU3_VL3_CP:
+      type: tosca.nodes.nfv.doctor.Cpd
+      properties:
+        name: VDU3_VL3_CP
+        layer_protocol: VXLAN
+      requirements:
+        - virtual_link: VL3
+        - virtual_binding: VDU3
+
+    VDU4_VL3_CP:
+      type: tosca.nodes.nfv.doctor.Cpd
+      properties:
+        name: VDU4_VL3_CP
+        layer_protocol: VXLAN
+      requirements:
+        - virtual_link: VL3
+        - virtual_binding: VDU4
+
+    VDU4_VL4_CP:
+      type: tosca.nodes.nfv.doctor.Cpd
+      properties:
+        name: VDU4_VL4_CP
+        layer_protocol: VXLAN
+      requirements:
+        - virtual_link: VL4
+        - virtual_binding: VDU4
+
+    VDU5_VL4_CP:
+      type: tosca.nodes.nfv.doctor.Cpd
+      properties:
+        name: VDU5_VL4_CP
+        layer_protocol: VXLAN
+      requirements:
+        - virtual_link: VL4
+        - virtual_binding: VDU5
+
+    VDU6_VL5_CP:
+      type: tosca.nodes.nfv.doctor.Cpd
+      properties:
+        name: VDU6_VL5_CP
+        layer_protocol: VXLAN
+      requirements:
+        - virtual_link: VL5
+        - virtual_binding: VDU6
+
+    VDU6_VL6_CP:
+      type: tosca.nodes.nfv.doctor.Cpd
+      properties:
+        name: VDU6_VL6_CP
+        layer_protocol: VXLAN
+      requirements:
+        - virtual_link: VL6
+        - virtual_binding: VDU6
+
+    VDU7_VL6_CP:
+      type: tosca.nodes.nfv.doctor.Cpd
+      properties:
+        name: VDU7_VL6_CP
+        layer_protocol: VXLAN
+      requirements:
+        - virtual_link: VL6
+        - virtual_binding: VDU7
+
+    VDU7_VL7_CP:
+      type: tosca.nodes.nfv.doctor.Cpd
+      properties:
+        name: VDU7_VL7_CP
+        layer_protocol: VXLAN
+      requirements:
+        - virtual_link: VL7
+        - virtual_binding: VDU7
+
+    VDU8_VL7_CP:
+      type: tosca.nodes.nfv.doctor.Cpd
+      properties:
+        name: VDU8_VL7_CP
+        layer_protocol: VXLAN
+      requirements:
+        - virtual_link: VL7
+        - virtual_binding: VDU8
+
+    VDU8_VL8_CP:
+      type: tosca.nodes.nfv.doctor.Cpd
+      properties:
+        name: VDU8_VL8_CP
+        layer_protocol: VXLAN
+      requirements:
+        - virtual_link: VL8
+        - virtual_binding: VDU8
+
+    VDU9_VL8_CP:
+      type: tosca.nodes.nfv.doctor.Cpd
+      properties:
+        name: VDU9_VL8_CP
+        layer_protocol: VXLAN
+      requirements:
+        - virtual_link: VL8
+        - virtual_binding: VDU9
+
+    VDUX_VL10_CP:
+      type: tosca.nodes.nfv.doctor.Cpd
+      properties:
+        name: VDUX_VL10_CP
+        layer_protocol: VXLAN
+      requirements:
+        - virtual_link: VL10
+        - virtual_binding: VDUX
+
+    VDUX_VL2_CP:
+      type: tosca.nodes.nfv.doctor.Cpd
+      properties:
+        name: VDUX_VL2_CP
+        layer_protocol: VXLAN
+      requirements:
+        - virtual_link: VL2
+        - virtual_binding: VDUX
+
+##########################################################################
+ # Virtual Links
+##########################################################################
+
+    VL1:
+      type: tosca.nodes.nfv.doctor.VnfVirtualLinkDesc
+      properties:
+        name: VL1
+        connectivity_type: VXLAN
+
+    VL2:
+      type: tosca.nodes.nfv.doctor.VnfVirtualLinkDesc
+      properties:
+        name: VL2
+        connectivity_type: VXLAN
+
+    VL3:
+      type: tosca.nodes.nfv.doctor.VnfVirtualLinkDesc
+      properties:
+        name: VL3
+        connectivity_type: VXLAN
+
+    VL4:
+      type: tosca.nodes.nfv.doctor.VnfVirtualLinkDesc
+      properties:
+        name: VL4
+        connectivity_type: VXLAN
+
+    VL5:
+      type: tosca.nodes.nfv.doctor.VnfVirtualLinkDesc
+      properties:
+        name: VL5
+        connectivity_type: VXLAN
+
+    VL6:
+      type: tosca.nodes.nfv.doctor.VnfVirtualLinkDesc
+      properties:
+        name: VL6
+        connectivity_type: VXLAN
+
+    VL7:
+      type: tosca.nodes.nfv.doctor.VnfVirtualLinkDesc
+      properties:
+        name: VL7
+        connectivity_type: VXLAN
+
+    VL8:
+      type: tosca.nodes.nfv.doctor.VnfVirtualLinkDesc
+      properties:
+        name: VL8
+        connectivity_type: VXLAN
+
+    VL9:
+      type: tosca.nodes.nfv.doctor.VnfVirtualLinkDesc
+      properties:
+        name: VL9
+        connectivity_type: VXLAN
+
+    VL10:
+      type: tosca.nodes.nfv.doctor.VnfVirtualLinkDesc
+      properties:
+        name: VL10
+        connectivity_type: VXLAN
+
+##########################################################################
+ # Forwarding Paths
+##########################################################################
+
+    http_from_r1_to_r2:
+      type: tosca.nodes.nfv.doctor.FP
+      description: creates path for /http from r1 to r2
+      properties:
+        id: 1
+        policy:
+          type: NDN
+          prefix: [/com/google]
+        path:
+          - forwarder: router_1
+            capability: VDU1_VL1_CP
+
+          - forwarder: router_2
+            capability: VDU2_VL1_CP
+
+    http_from_r2_to_as1:
+      type: tosca.nodes.nfv.doctor.FP
+      description: creates path for /http from r2 to as1
+      properties:
+        id: 2
+        policy:
+          type: NDN
+          prefix: [/com/google]
+        path:
+          - forwarder: router_2
+            capability: VDU2_VL10_CP
+
+          - forwarder: router_x
+            capability: VDUX_VL10_CP
+          - forwarder: router_x
+            capability: VDUX_VL2_CP
+
+          - forwarder: router_4
+            capability: VDU3_VL2_CP
+          - forwarder: router_4
+            capability: VDU3_VL3_CP
+          - forwarder: firewall_1
+            capability: VDU4_VL3_CP
+          - forwarder: firewall_1
+            capability: VDU4_VL4_CP
+          - forwarder: peering_router_1
+            capability: VDU5_VL4_CP
+
+    http_from_r2_to_as2:
+      type: tosca.nodes.nfv.doctor.FP
+      description: creates path for /http from r2 to as2
+      properties:
+        id: 3
+        policy:
+          type: NDN
+          prefix: [/com/google]
+        path:
+          - forwarder: router_2
+            capability: VDU2_VL5_CP
+          - forwarder: router_3
+            capability: VDU6_VL5_CP
+          - forwarder: router_3
+            capability: VDU6_VL6_CP
+          - forwarder: router_5
+            capability: VDU7_VL6_CP
+          - forwarder: router_5
+            capability: VDU7_VL7_CP
+          - forwarder: firewall_2
+            capability: VDU8_VL7_CP
+          - forwarder: firewall_2
+            capability: VDU8_VL8_CP
+          - forwarder: peering_router_2
+            capability: VDU9_VL8_CP
+
+##########################################################################
+ # Policies
+##########################################################################
+
+  policies:
+
+    - CPA_countermeasure:
+        type: tosca.policies.nfv.doctor.security.signature_verification
+        targets: [router_4, router_5]
+        triggers:
+
+          peeringPoint1_verification:
+            event_type: tosca.nfv.doctor.security.alert.cpa
+            condition:
+              constraint: triggred_by router_2
+            action:
+              action_type: update_router_mode
+              mode: signing
+              target_router: router_4
+
+          peeringPoint2_verification:
+            event_type: tosca.nfv.doctor.security.alert.cpa
+            condition:
+              constraint: triggred_by router_2
+            action:
+              action_type: update_router_mode
+              mode: signing
+              target_router: router_5
+
+
+    - update_firewall_1:
+        type: tosca.policies.nfv.doctor.ndn.security.update_firewall
+        targets: [firewall_1, firewall_2]
+        triggers:
+
+          peering_point_1:
+            event_type: tosca.nfv.doctor.security.alert.poisoned_content
+            condition:
+              constraint: triggred_by router_4
+            action:
+              action_type: update_firewall
+              target_firewall: firewall_1
+
+          peering_point_2:
+            event_type: tosca.nfv.doctor.security.alert.poisoned_content
+            condition:
+              constraint: triggred_by router_5
+            action:
+              action_type: update_firewall
+              target_firewall: firewall_2
+
+
+    - scaling_out_policy:
+        type: tosca.policies.nfv.doctor.ndn.scaling
+        targets: [router_4, router_5]
+        triggers:
+          scale_out:
+            meter_name: PIT
+            event_type: tosca.policies.nfv.doctor.ndn.utilization
+            condition:
+              constraint: pending_interests greater_than 5
+              threshold: 5
+              comparison_operator: gt
+              period: 600
+            action:
+              action_type: scale_out
+              number: 3
+
+
+##########################################################################
+ # Forwarding graph
+##########################################################################
+
+  groups:
+    VNFFG1:
+      type: tosca.groups.nfv.doctor.VNFFG
+      description: FR and COM interest to egress_gw
+      properties:
+        vendor: Doctor
+        version: 1.0
+        dependent_virtual_link: [VL]
+        connection_point: [router]
+        constituent_vnfs: [CP]
+      members: [http_from_r1_to_r2, http_from_r2_to_as2, http_from_r2_to_as1]

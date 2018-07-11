@@ -1,0 +1,10 @@
+npm ERR! path /Users/long/workspace/pro/mano_v3/package.json
+npm ERR! code ENOENT
+npm ERR! errno -2
+npm ERR! syscall open
+npm ERR! enoent ENOENT: no such file or directory, open '/Users/long/workspace/pro/mano_v3/package.json'
+npm ERR! enoent This is related to npm not being able to find a file.
+npm ERR! enoent 
+
+npm ERR! A complete log of this run can be found in:
+npm ERR!     /Users/long/.npm/_logs/2018-06-27T10_14_37_781Z-debug.log
